@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import DateGrid from './DateGrid'
 import Notes from './Notes'
 import { MONTH_THEMES } from './themes'; 
+
 const MONTH_NAMES = [
   'January','February','March','April','May','June',
   'July','August','September','October','November','December'
@@ -23,6 +24,7 @@ const MONTH_IMAGES = [
   '/images/nov.jpg',
   '/images/dec.jpg',
 ]
+
 export default function Calendar() {
   const today = new Date()
   const [currentMonth, setCurrentMonth] = useState(today.getMonth())
@@ -31,7 +33,13 @@ export default function Calendar() {
   const [endDate, setEndDate] = useState(null)
   const [animating, setAnimating] = useState(false)
   const [direction, setDirection] = useState('next')
+  const [notes, setNotes] = useState('')  
   const theme = MONTH_THEMES[currentMonth];
+
+  useEffect(() => {
+    const saved = localStorage.getItem('calendar-notes')
+    if (saved) setNotes(saved)
+  }, [])
 
   const changeMonth = (dir) => {
     setDirection(dir)
@@ -52,20 +60,20 @@ export default function Calendar() {
 
   return (
     <div
-         className="min-h-screen flex items-center justify-center p-4"
-         style={{
-            backgroundColor: theme.bg,
-            color: theme.text,
-            transition: 'background-color 0.4s ease, color 0.4s ease',
-           }}
-        >
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        backgroundColor: theme.bg,
+        color: theme.text,
+        transition: 'background-color 0.4s ease, color 0.4s ease',
+      }}
+    >
       <div className="w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border border-stone-300"
-         style={{
-            borderColor: theme.primary,
-            fontFamily: 'var(--font-lato), sans-serif',
-            transition: 'border-color 0.4s ease',
-            }}
-        >
+        style={{
+          borderColor: theme.primary,
+          fontFamily: 'var(--font-lato), sans-serif',
+          transition: 'border-color 0.4s ease',
+        }}
+      >
         {/* Calendar binding holes */}
         <div className="bg-stone-800 h-8 flex items-center justify-around px-8">
           {[...Array(12)].map((_, i) => (
@@ -83,10 +91,9 @@ export default function Calendar() {
               className="w-full h-72 md:h-full object-cover transition-opacity duration-500"
               style={{ opacity: animating ? 0 : 1 }}
             />
-            {/* Overlay with month name */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <p className="text-5xl font-bold text-white drop-shadow" style={{fontFamily: 'Georgia, serif', letterSpacing: '2px'}}>{MONTH_NAMES[currentMonth]}</p>
-            <p className="text-2xl text-white/80">{currentYear}</p>
+              <p className="text-5xl font-bold text-white drop-shadow" style={{ fontFamily: 'Georgia, serif', letterSpacing: '2px' }}>{MONTH_NAMES[currentMonth]}</p>
+              <p className="text-2xl text-white/80">{currentYear}</p>
             </div>
           </div>
 
@@ -135,12 +142,14 @@ export default function Calendar() {
               </div>
             )}
 
-            {/* Notes */}
-            <Notes 
-                startDate={startDate} 
-                endDate={endDate} 
-                theme={theme}
-              />
+            {/* Notes - now with notes and setNotes passed correctly */}
+            <Notes
+              notes={notes}
+              setNotes={setNotes}
+              startDate={startDate}
+              endDate={endDate}
+              theme={theme}
+            />
 
           </div>
         </div>
